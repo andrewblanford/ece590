@@ -1,2 +1,4 @@
-# ece590
-Homework and Projects for ECE590
+hubo-simple-demo
+================
+
+simple c demmo for hubo
