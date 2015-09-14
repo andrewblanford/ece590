@@ -48,13 +48,30 @@ int main(int argc, char **argv) {
         assert( sizeof(H_state) == fs );
     }
 
-    /* Move elbow and shoulder into wave position */
-    H_ref.ref[LEB] = -2.0;
-    H_ref.ref[LSP] = -0.5;
-    H_ref.ref[LWR] = 1.5;
-    H_ref.ref[LWP] = -0.5;
-    H_ref.ref[LSY] = 0.0;
-
+    /* Sway to be over 1 foot = 8.5 degrees? */
+    H_ref.ref[RHR] = .07;
+    H_ref.ref[RAR] = -.07;
+    H_ref.ref[LHR] = .07;
+    H_ref.ref[LAR] = -.07;
+    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
+	sleep(1);
+    H_ref.ref[RHR] = .14;
+    H_ref.ref[RAR] = -.14;
+    H_ref.ref[LHR] = .14;
+    H_ref.ref[LAR] = -.14;
+    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
+	sleep(2);
+	/* bend knee slightly */
+    //H_ref.ref[RHP] = -.28;
+    //H_ref.ref[RKN] = .56;
+    //H_ref.ref[RAP] = -.28;
+    H_ref.ref[LHP] = -.28;
+    H_ref.ref[LKN] = .56;
+    H_ref.ref[LAP] = -.28;
+	// raise right arm for balance? 
+    H_ref.ref[RSR] = -.25;
+    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
+	
 
     /* Print out the actual position of the LEB */
     double posLEB = H_state.joint[LEB].pos;
@@ -69,32 +86,30 @@ int main(int argc, char **argv) {
 
 	sleep(2);
 
-#define TIME_STEP (250000)
+	/* Lift left leg */
+	H_ref.ref[LHP] = -.7;
+	H_ref.ref[LKN] = 1.4;
 
-	int i = 0;
-	while (i < 30) {
-	    H_ref.ref[LSY] = 0.0;
-	    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
-		usleep(TIME_STEP);
-	    H_ref.ref[LSY] = 0.4;
-	    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
-		usleep(TIME_STEP);
-	    H_ref.ref[LSY] = 0.0;
-	    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
-		usleep(TIME_STEP);
-	    H_ref.ref[LSY] = -0.4;
-	    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
-		usleep(TIME_STEP);
-		i++;
-		printf("Wave %d\n", i);
-	}
+    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
+
+	sleep(10);
 
 	// return to base position
-    H_ref.ref[LEB] = 0.0;
-    H_ref.ref[LSP] = 0.0;
-    H_ref.ref[LWR] = 0.0;
-    H_ref.ref[LWP] = 0.0;
-    H_ref.ref[LSY] = 0.0;
+    H_ref.ref[RHP] = 0;
+    H_ref.ref[RKN] = 0;
+    H_ref.ref[RAP] = 0;
+    H_ref.ref[LHP] = 0;
+    H_ref.ref[LKN] = 0;
+    H_ref.ref[LAP] = 0;
+    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
+
+	sleep(2);
+	
+    H_ref.ref[RHR] = 0.0;
+    H_ref.ref[RAR] = 0.0;
+    H_ref.ref[LHR] = 0.0;
+    H_ref.ref[LAR] = 0.0;
+    H_ref.ref[RSR] = 0.0;
 	ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
 }
 
