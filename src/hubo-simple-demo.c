@@ -52,6 +52,10 @@ int main(int argc, char **argv) {
 	H_ref.ref[RSR] = -.1;
 	H_ref.ref[LSR] = .1;
 
+	/* Assumes all leg joints are set to max torque 100 
+	* and the knee joints to 400
+	*/
+
     /* Sway to be over 1 foot = 8.5 degrees? */
 	double baseAngle = .14 / 10.0;
 	for (int i = 0; i < 11; ++i) {
@@ -77,7 +81,7 @@ int main(int argc, char **argv) {
 	sleep(2);
 
 	// begin knee bends
-	const int INTERVAL_USEC = 125000;
+	const int INTERVAL_USEC = 250000;
 	int direction = 1; // start going down
 	const int NUM_INTERVALS = 16;
 	// need 49 degree deflection in hip to create .2m amplitude
