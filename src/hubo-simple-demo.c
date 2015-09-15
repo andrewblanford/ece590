@@ -48,51 +48,69 @@ int main(int argc, char **argv) {
         assert( sizeof(H_state) == fs );
     }
 
+	// move arms out of the way
+	H_ref.ref[RSR] = -.1;
+	H_ref.ref[LSR] = .1;
+
     /* Sway to be over 1 foot = 8.5 degrees? */
-    H_ref.ref[RHR] = .07;
-    H_ref.ref[RAR] = -.07;
-    H_ref.ref[LHR] = .07;
-    H_ref.ref[LAR] = -.07;
-    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
+	double baseAngle = .14 / 10.0;
+	for (int i = 0; i < 11; ++i) {
+	    H_ref.ref[RHR] = baseAngle * i;
+	    H_ref.ref[RAR] = -baseAngle * i;
+	    H_ref.ref[LHR] = baseAngle * i;
+	    H_ref.ref[LAR] = -baseAngle * i;
+	    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
+		usleep(500000);
+	}
 	sleep(1);
-    H_ref.ref[RHR] = .14;
-    H_ref.ref[RAR] = -.14;
-    H_ref.ref[LHR] = .14;
-    H_ref.ref[LAR] = -.14;
-    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
-	sleep(2);
-	/* bend knee slightly */
-    //H_ref.ref[RHP] = -.28;
-    //H_ref.ref[RKN] = .56;
-    //H_ref.ref[RAP] = -.28;
-    H_ref.ref[LHP] = -.28;
-    H_ref.ref[LKN] = .56;
-    H_ref.ref[LAP] = -.28;
-	// raise right arm for balance? 
-    H_ref.ref[RSR] = -.25;
-    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
-	
+	printf("RHR: %f\n", H_ref.ref[RHR]);
 
-    /* Print out the actual position of the LEB */
-    double posLEB = H_state.joint[LEB].pos;
-    printf("Joint = %f\r\n",posLEB);
-
-    /* Print out the Left foot torque in X */
-    double mxLeftFT = H_state.ft[HUBO_FT_L_FOOT].m_x;
-    printf("Mx = %f\r\n", mxLeftFT);
-
-    /* Write to the feed-forward channel */
-    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
-
+	/* bend knee slowly to raise the leg */
+	baseAngle = .05;
+	for (int i = 0; i < 20; ++i) {
+	    H_ref.ref[LHP] = -baseAngle * i;
+	    H_ref.ref[LKN] = 2 * baseAngle * i;
+	    H_ref.ref[LAP] = -baseAngle * i;
+	    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
+		usleep(500000);
+	}
 	sleep(2);
 
-	/* Lift left leg */
-	H_ref.ref[LHP] = -.7;
-	H_ref.ref[LKN] = 1.4;
+	// begin knee bends
+	const int INTERVAL_USEC = 125000;
+	int direction = 1; // start going down
+	const int NUM_INTERVALS = 16;
+	// need 49 degree deflection in hip to create .2m amplitude
+	baseAngle = .87 / NUM_INTERVALS;
+	double baseHipAngle = (.22 - .14) / NUM_INTERVALS;
+	for (int reps = 0; reps < 10; ++reps) {
+		printf("Bend %d\n", reps);
+		// bend knee - 2 seconds
+		for (int i = 0; i < NUM_INTERVALS; ++i) {
+			ach_get( &chan_hubo_state, &H_state, sizeof(H_state), &fs, NULL, ACH_O_LAST );
+			double begin = H_state.time;
+			// bend the knee
+			H_ref.ref[RHP] += -baseAngle * direction;
+		    H_ref.ref[RKN] += 2 * baseAngle * direction;
+		    H_ref.ref[RAP] += -baseAngle * direction;
+			// move the hip / ankle so CoM stays over foot
+/*
+			H_ref.ref[RHR] += baseHipAngle * direction;
+			H_ref.ref[RAR] += -baseHipAngle * direction;
+			H_ref.ref[LHR] += baseHipAngle * direction;
+			H_ref.ref[LAR] += -baseHipAngle * direction;
+*/
+			printf("RHP: %f \t RHR: %f\n", H_ref.ref[RHP], H_ref.ref[RHR]);
+		    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
+			ach_get( &chan_hubo_state, &H_state, sizeof(H_state), &fs, NULL, ACH_O_LAST );
+			double end = H_state.time;
+			usleep(INTERVAL_USEC - (end - begin));
+		}
+		direction = direction * -1;
+	}
 
-    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
 
-	sleep(10);
+	sleep(5);
 
 	// return to base position
     H_ref.ref[RHP] = 0;
@@ -110,6 +128,7 @@ int main(int argc, char **argv) {
     H_ref.ref[LHR] = 0.0;
     H_ref.ref[LAR] = 0.0;
     H_ref.ref[RSR] = 0.0;
+    H_ref.ref[LSR] = 0.0;
 	ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
 }
 
