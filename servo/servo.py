@@ -65,7 +65,7 @@ def tick2rad(ticks):
 	# subtract 150 degrees to get back to original angle
 	return r - math.radians(150.0)
 
-TIME_STEP = .05
+TIME_STEP = .01
 amp = 90
 freq = .5
 elapsed = 0;
