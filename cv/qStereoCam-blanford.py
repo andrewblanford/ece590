@@ -121,14 +121,15 @@ while True:
     numRows = imgR.shape[0]
     numCols = imgR.shape[1]
 
-    # lower and upper range of blue in BGR format
-    lower = np.array([0, 100, 0], np.uint8)
-    upper = np.array([50, 255, 50], np.uint8)
-    # use cv funtion to find the blue mask
+    # lower and upper range of yellow in BGR format
+    lower = np.array([0, 100, 100], np.uint8)
+    upper = np.array([50, 255, 255], np.uint8)
+    # use cv funtion to find the yellow mask
     maskR = cv2.inRange(imgR, lower, upper)
     maskL = cv2.inRange(imgL, lower, upper)
     cv2.imshow("maskR", maskR)
     cv2.imshow("maskL", maskL)
+
     # find the CG
     # add up all the mask values > 0 and track accumlated positions
     txR = 0
@@ -148,15 +149,21 @@ while True:
                 tyL += y
                 aL = aL + 1
 
+    f = .085
+    b = .4
+    ps = .000280
     xR = 0.0
     xL = 1.0
     if aR > 0 and aL > 0: 
         xR = txR / aR
         xL = txL / aL
+        dX = abs(xR - xL)
+        depth = (f * b) / (dX * ps)
+        # calculate a second depth if dX is 1 more pixel
+        depth2 = (f * b) / ((dX + 1) * ps)
+        print "Depth: ", depth
+        print "Res: ", (depth - depth2)
 
-    depth = (.085 * .4) / (abs(xR - xL) * .000280)
-
-    print depth
 
     # Sleeps
     time.sleep(0.1)   

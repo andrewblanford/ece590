@@ -122,12 +122,12 @@ while True:
     numRows = imgR.shape[0]
     numCols = imgR.shape[1]
 
-    # lower and upper range of blue in BGR format
+    # lower and upper range of yellow in BGR format
     lower = np.array([0, 100, 100], np.uint8)
     upper = np.array([50, 255, 255], np.uint8)
-    # use cv funtion to find the blue mask
+    # use cv funtion to find the yellow mask
     mask = cv2.inRange(imgR, lower, upper)
-    cv2.imshow("mask", mask)
+
     # find the CG
     # add up all the mask values > 0 and track accumlated positions
     tx = 0
@@ -140,12 +140,19 @@ while True:
                 ty += y
                 a = a + 1
 
+    KNOWN_RADIUS = .5
     if a > 0:
-        r = math.sqrt(a / math.pi)
-
+        # get radius in pixels
+        r = math.floor(math.sqrt(a / math.pi))
+        # calculate depth in pixels
         dpx = (numCols / 2) / math.tan(1.047 / 2.0)
-        dist = (0.5 / r) * dpx
+        # calculate actual depth with conversion using known size
+        dist = (KNOWN_RADIUS / r) * dpx
         print "Dist: ", dist
+        # calculate the resolution at this depth by changing r by .5
+        # corresponds to change of diameter by 1 px
+        dist2 = (KNOWN_RADIUS / (r + .5)) * dpx
+        print "Res: ", (dist - dist2)
 
     # Sleeps
     time.sleep(0.1)   
