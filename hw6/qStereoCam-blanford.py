@@ -70,7 +70,7 @@ t = ach.Channel(ROBOT_TIME_CHAN)
 t.flush()
 
 i=0
-
+approachPercent = 0.0
 
 print '======================================'
 print '============= Robot-View ============='
@@ -133,33 +133,38 @@ while True:
     if target['found']:
         # compute offset from center
         # just use the right camera for center
-        x = target['xR'] - (numCols/2)
+        x = (target['xR']) - (numCols/2)
         y = -(target['yR'] - (numRows/2))
-        print "x: ", x, " Depth:", target['depth']
         errDepth = depthDes - target['depth']
         errX = xDes - x
+        print target['depth'],",", errDepth
         # check for centered (within 5 pixels of center)
         # maybe this becomes depth dependent?
         # depth resolution at 5m should be about .2m
-        if errX < 5 
-           if errDepth > .2:
+        if errX < 3 and errX > -3:
+           # make sure to pause before driving forward
+           if errDepth > .2 or errDepth < -.2:
               c = visualServo.getApproachCommand(errDepth)
-              ref.ref[0] = c
-              ref.ref[1] = c
+              # ramp up forward roll so we don't jump around
+              c = c * approachPercent
+              ref.ref[0] = -c
+              ref.ref[1] = -c
            else: 
               # centered and at target distance - stop
               ref.ref[0] = 0
-              ref.ref[1] = 1
+              ref.ref[1] = 0
+           approachPercent = min(approachPercent + .1, 1)
         else:
            # not centered yet
            c = visualServo.getCenteringCommand(errX)
            # set commands
            ref.ref[0] = c
            ref.ref[1] = -c
+           approachPercent = 0
     else: 
         # search pattern - turn in place
-        ref.ref[0] = -0.4
-        ref.ref[1] = 0.4 
+        ref.ref[0] = -0.3
+        ref.ref[1] = 0.3 
 
     # Sets reference to robot
     r.put(ref);

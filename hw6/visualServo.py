@@ -44,6 +44,8 @@ def findTarget(imgL, imgR, lower, upper):
     ps = .000280
     xR = 0.0
     xL = 1.0
+    yL = 0
+    yR = 0
     depth = 0.0
     found = False
     if aR > 0 and aL > 0: 
@@ -58,27 +60,26 @@ def findTarget(imgL, imgR, lower, upper):
     return {'found':found, 'xR':xR, 'yR':yR, 'xL':xL, 'yL':yL, 'depth':depth}
 
 def getCenteringCommand(error):
-    kp = .2
+    kp = .001
     kd = .1
     #c = (kp * error) + (kd * ((error - eLast) / (tNow - tLast)))
-    c = kp * e
+    c = kp * error
     #eLast = error
-    print "C: ", c
-    # clamp c to -1 to 1
-    c / (numCols / 2)
-    if c > 1:
-        c = 1
-    if c < -1: 
-        c = -1
+    # clamp c 
+    #c / (numCols / 2)
+    if c > .8:
+        c = .8
+    if c < -.8: 
+        c = -.8
     return c
 
 def getApproachCommand(error):
-    kp = .2
+    kp = .12
     c = (kp * error)
-    # clamp c to -1 to 1
-    if c > 1:
-        c = 1
-    if c < -1: 
-        c = -1
+    # clamp c 
+    if c > .5:
+        c = .5
+    if c < -.5: 
+        c = -.5
     return c
 
