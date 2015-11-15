@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# Andrew Blanford
+# IPC definitions and constants
 
 from ctypes import Structure,c_uint16,c_double,c_ubyte,c_uint32,c_int16
 
