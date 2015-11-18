@@ -12,3 +12,7 @@ class E_VALUE(Structure):
    _pack_ = 1
    _fields_ = [("value", c_double*1),
                ("time", c_double*1)]
+
+class E_SERVO(Structure):
+   _pack_ = 1
+   _fields_ = [("command", c_double*2)]

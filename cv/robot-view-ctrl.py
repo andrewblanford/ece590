@@ -46,7 +46,7 @@ ROBOT_TIME_CHAN  = 'robot-time'
 # CV setup 
 cv.NamedWindow("wctrl", cv.CV_WINDOW_AUTOSIZE)
 #capture = cv.CaptureFromCAM(0)
-#capture = cv2.VideoCapture(0)
+capture = cv2.VideoCapture(0)
 
 # added
 ##sock.connect((MCAST_GRP, MCAST_PORT))
@@ -74,18 +74,12 @@ print '========= dan@danLofaro.com =========='
 print '======================================'
 while True:
     # Get Frame
-    img = np.zeros((newx,newy,3), np.uint8)
-    c_image = img.copy()
-    vid = cv2.resize(c_image,(newx,newy))
-    [status, framesize] = v.get(vid, wait=False, last=True)
-    if status == ach.ACH_OK or status == ach.ACH_MISSED_FRAME or status == ach.ACH_STALE_FRAMES:
-        vid2 = cv2.resize(vid,(nx,ny))
-        img = cv2.cvtColor(vid2,cv2.COLOR_BGR2RGB)
-        cv2.imshow("wctrl", img)
-        cv2.waitKey(10)
-    else:
-        raise ach.AchException( v.result_string(status) )
+    ret, vid = capture.read()
 
+    vid2 = cv2.resize(vid,(nx,ny))
+    img = cv2.cvtColor(vid2,cv2.COLOR_BGR2RGB)
+    cv2.imshow("wctrl", img)
+    cv2.waitKey(10)
 
     [status, framesize] = t.get(tim, wait=False, last=True)
     if status == ach.ACH_OK or status == ach.ACH_MISSED_FRAME or status == ach.ACH_STALE_FRAMES:
