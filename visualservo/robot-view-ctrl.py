@@ -48,8 +48,8 @@ capture = cv2.VideoCapture(0)
 newx = 320
 newy = 240
 
-nx = 640
-ny = 480
+nx = 80
+ny = 60
 
 r = ach.Channel(ipc.EXAMPLE_CHAN_1)
 r.flush()
@@ -89,7 +89,7 @@ while True:
     numCols = img.shape[1]
 
     # lower and upper range of blue in BGR format
-    lower = np.array([100, 0, 0], np.uint8)
+    lower = np.array([120, 0, 0], np.uint8)
     upper = np.array([255, 100, 100], np.uint8)
     # use cv funtion to find the blue mask
     mask = cv2.inRange(img, lower, upper)
@@ -122,22 +122,25 @@ while True:
     tNow = time.time()
     if found:
         # compute offset from center (-1 to 1)
-        x = (x - (numCols/2)) / (numCols/2))
-        y = -((y - (numRows/2)) / (numRows/2))
+        offsetX = (x - (numCols/2))
+        offsetY = -(y - (numRows/2))
+        x = float(offsetX) / (numCols/2)
+        y = float(offsetY) / (numRows/2)
+        print "offset: ", offsetX, offsetY, x, y
         # get control output - base on x only
         xDes = 0
         yDes = 0
-        kp = .2
-        kd = .1
+        kp = 7.0
+        kd = 1.7
         eX = xDes - x
         eY = yDes - y
-	print "e", eX eY
-        cx = (kp * eX) + (kd * ((eX - eLastX) / (tNow - tLast)))
-        cy = (kp * eY) + (kd * ((eY - eLastY) / (tNow - tLast)))
-        cx = cx * (tNow - tLast) + cLastX
-        cx = cy * (tNow - tLast) + cLastY
-        cLastX = cx
-        cLastY = cy
+	print "e", eX, eY
+        cX = (kp * eX) + (kd * ((eX - eLastX) / (tNow - tLast)))
+        cY = (kp * eY) + (kd * ((eY - eLastY) / (tNow - tLast)))
+        cX = cX * (tNow - tLast) + cLastX
+        cY = cY * (tNow - tLast) + cLastY
+        cLastX = cX
+        cLastY = cY
         eLastX = eX
         eLastY = eY
         print "C: ", cX, cY
@@ -147,12 +150,9 @@ while True:
         ref.command[0] = cX
         ref.command[1] = cY
     else: 
-        # if not found, maximize e
-        eLastX = 0
-        eLastY = 0
-        # search pattern - turn in place
-        ref.ref[0] = 0
-        ref.ref[1] = 0    
+        # if not found, do nothing
+        ref.command[0] = cLastX
+        ref.command[1] = cLastY
     tLast = tNow
     
     # Sets reference to robot
