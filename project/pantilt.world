@@ -13,7 +13,7 @@
     
 
    <model name ='PanTiltCam'>
-  <static>true</static>
+  <static>false</static>
       <pose>0 0 0 0 0 0</pose>
       <link name ='base'>
          <pose>0 0 .025 0 0 0</pose>
@@ -81,7 +81,61 @@
             </material>
          </visual>
       </link>
+      <link name ='armLink'>
+         <pose>.0135 .022 .1355 0 0 0</pose>
+         <collision name ='collision'>
+            <geometry>
+               <box>
+                  <size>.024 .003 .037</size>
+               </box>
+            </geometry>
+         </collision>
+         <visual name ='visual'>
+            <geometry>
+               <box>
+                  <size>.024 .003 .037</size>
+               </box>
+            </geometry>
+            <material>
+               <ambient>0 0 1 1</ambient>
+               <diffuse>0 0 1 1</diffuse>
+               <specular>0.1 0.1 0.1 1</specular>
+               <emissive>0 0 0 0</emissive>
+            </material>
+         </visual>
+      </link>
 
+      <!-- Joints -->
+      <joint type="revolute" name="basejoint">
+         <child>panLink</child>
+         <parent>base</parent>
+         <axis>
+            <xyz>0 0 0</xyz>
+            <limit>
+               <upper>0</upper>
+               <lower>0</lower>
+            </limit>
+         </axis>
+      </joint>
+
+      <joint type="revolute" name="pan">
+         <child>tiltLink</child>
+         <parent>panLink</parent>
+         <axis><xyz>0 0 1</xyz></axis>
+      </joint>
+
+      <joint type="revolute" name="tilt">
+         <pose>0 0 -.007 0 0 0</pose>
+         <child>armLink</child>
+         <parent>tiltLink</parent>
+         <axis><xyz>0 1 0</xyz></axis>
+      </joint>
+
+      <!-- plugin -->
+      <plugin filename="build/libpt_drive.so" name="pt_drive_plugin">
+         <pan>pan</pan>
+         <tilt>tilt</tilt>
+      </plugin>
    </model>
 
 
