@@ -1,0 +1,104 @@
+<?xml version="1.0"?> 
+<sdf version="1.4">
+  <world name="default">
+
+    <!-- Ground Plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    
+
+   <model name ='PanTiltCam'>
+  <static>true</static>
+      <pose>0 0 0 0 0 0</pose>
+      <link name ='base'>
+         <pose>0 0 .025 0 0 0</pose>
+         <collision name='collision'>
+            <geometry>
+               <box><size>.2 .2 .05</size></box>
+            </geometry>
+         </collision>
+         <visual name = 'visual'>
+            <geometry>
+               <box><size>.2 .2 .05</size></box>
+            </geometry>
+            <material>
+               <ambient>1 0 0 1</ambient>
+               <diffuse>1 0 0 1</diffuse>
+               <specular>0.1 0.1 0.1 1</specular>
+               <emissive>0 0 0 0</emissive>
+            </material>
+         </visual>
+      </link>
+      <!-- pan servo --> 
+      <link name ='panLink'>
+         <pose>0 0 .07 0 0 0</pose>
+         <collision name ='collision'>
+            <geometry>
+               <box>
+                  <size>.050 .032 .040</size>
+               </box>
+            </geometry>
+         </collision>
+         <visual name ='visual'>
+            <geometry>
+               <box>
+                  <size>.050 .032 .040</size>
+               </box>
+            </geometry>
+            <material>
+               <ambient>1 1 0 1</ambient>
+               <diffuse>1 1 0 1</diffuse>
+               <specular>0.1 0.1 0.1 1</specular>
+               <emissive>0 0 0 0</emissive>
+            </material>
+         </visual>
+      </link>
+      <link name ='tiltLink'>
+         <pose>.0135 0 .115 0 0 0</pose>
+         <collision name ='collision'>
+            <geometry>
+               <box>
+                  <size>.032 .040 .050</size>
+               </box>
+            </geometry>
+         </collision>
+         <visual name ='visual'>
+            <geometry>
+               <box>
+                  <size>.032 .040 .050</size>
+               </box>
+            </geometry>
+            <material>
+               <ambient>0 1 0 1</ambient>
+               <diffuse>0 1 0 1</diffuse>
+               <specular>0.1 0.1 0.1 1</specular>
+               <emissive>0 0 0 0</emissive>
+            </material>
+         </visual>
+      </link>
+
+   </model>
+
+
+<!-- Light Source -->
+        <light type="directional" name="sun">
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>1.0 1.0 1.0 1</diffuse>
+            <specular>0 0 0 1</specular>
+            <attenuation>
+                <range>20</range>
+                <linear>0.01</linear>
+                <constant>0.8</constant>
+                <quadratic>0.0</quadratic>
+            </attenuation>
+            <direction>0.0 0.2 -8.0</direction>
+            <cast_shadows>true</cast_shadows>
+        </light>
+     
+  </world>
+</sdf>
