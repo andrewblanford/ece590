@@ -17,3 +17,6 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 # compile plugin
 add_library(pt_drive SHARED pt_drive.cc)
 target_link_libraries(pt_drive ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread ach)
+
+add_library(pt_video SHARED pt_video.cc)
+target_link_libraries(pt_video ${GAZEBO_libraries} CameraPlugin ach)

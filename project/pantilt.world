@@ -13,7 +13,7 @@
     
 
    <model name ='PanTiltCam'>
-  <static>false</static>
+<static>false</static>
       <pose>0 0 0 0 0 0</pose>
       <link name ='base'>
          <pose>0 0 .025 0 0 0</pose>
@@ -82,18 +82,19 @@
          </visual>
       </link>
       <link name ='armLink'>
-         <pose>.0135 .022 .1355 0 0 0</pose>
+         <pose>.0135 0 .1355 0 0 0</pose>
          <collision name ='collision'>
+            <pose>0 0 .015 0 0 0</pose>
             <geometry>
                <box>
-                  <size>.024 .003 .037</size>
+                  <size>.024 .048 .007</size>
                </box>
             </geometry>
          </collision>
          <visual name ='visual'>
             <geometry>
                <box>
-                  <size>.024 .003 .037</size>
+                  <size>.024 .048 .037</size>
                </box>
             </geometry>
             <material>
@@ -103,6 +104,43 @@
                <emissive>0 0 0 0</emissive>
             </material>
          </visual>
+      </link>
+      <link name='camLink'>
+         <pose>.0135 0 .174 0 0 0</pose>
+         <collision name ='collision'>
+            <geometry>
+               <sphere><radius>.02</radius></sphere>
+            </geometry>
+         </collision>
+         <visual name ='visual'>
+            <geometry>
+               <sphere><radius>.02</radius></sphere>
+            </geometry>
+            <material>
+               <ambient>0 1 1 1</ambient>
+               <diffuse>0 1 1 1</diffuse>
+               <specular>0.1 0.1 0.1 1</specular>
+               <emissive>0 0 0 0</emissive>
+            </material>
+         </visual>
+         <sensor name='cam_sensor1' type='camera'>
+             <always_on>true</always_on>
+             <update_rate>10</update_rate>
+             <visualize>true</visualize>
+             <camera>
+                <horizontal_fov>1.57</horizontal_fov>
+                <image>
+                   <width>640</width>
+                   <height>480</height>
+                   <format>R8G8B8</format>
+                </image>
+                <clip>
+                   <near>0.5</near>
+                   <far>5</far>
+                </clip>
+             </camera>
+             <plugin name='pt_video' filename='build/libpt_video.so'/>
+         </sensor>
       </link>
 
       <!-- Joints -->
@@ -130,6 +168,19 @@
          <parent>tiltLink</parent>
          <axis><xyz>0 1 0</xyz></axis>
       </joint>
+
+      <joint type="revolute" name="camjoint">
+         <child>camLink</child>
+         <parent>armLink</parent>
+         <axis>
+            <xyz>0 0 0</xyz>
+            <limit>
+               <upper>0</upper>
+               <lower>0</lower>
+            </limit>
+         </axis>
+      </joint>
+
 
       <!-- plugin -->
       <plugin filename="build/libpt_drive.so" name="pt_drive_plugin">
