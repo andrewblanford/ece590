@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 find_package(Boost REQUIRED COMPONENTS system)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
+find_package(Protobuf REQUIRED)
 
 # find gazebo
 include (FindPkgConfig)
@@ -20,3 +21,7 @@ target_link_libraries(pt_drive ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF
 
 add_library(pt_video SHARED pt_video.cc)
 target_link_libraries(pt_video ${GAZEBO_libraries} CameraPlugin ach)
+
+
+add_executable(video_listener video_listener.cc)
+target_link_libraries(video_listener ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread ach)

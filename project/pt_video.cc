@@ -47,6 +47,8 @@ namespace gazebo
       /* open ach channel */
       int r = ach_open(&chan_pt_video, "robot-vid-chan" , NULL);
       assert( ACH_OK == r );
+
+	gzmsg << "Camera: " << this->parentSensor->GetName() << " update:" << this->parentSensor->GetUpdateRate();
     }
 
     // Update the controller
@@ -58,16 +60,17 @@ namespace gazebo
       snprintf(tmp, sizeof(tmp), "/tmp/%s-%04d.jpg",
           this->parentSensor->GetCamera()->GetName().c_str(), this->saveCount);
 
-      if (this->saveCount < 10)
+      if (this->saveCount < 1)
       {
         this->parentSensor->GetCamera()->SaveFrame(
             _image, _width, _height, _depth, _format, tmp);
         gzmsg << "Saving frame [" << this->saveCount
               << "] as [" << tmp << "]\n";
         this->saveCount++;
+      gzmsg << "Frame data w:" << _width << " h: " << _height << " d: " << _depth << " f: " << _format << "\n";
       }
 
-      ach_put(&chan_pt_video, _image, _width*_height);
+      ach_put(&chan_pt_video, _image, _width*_height*_depth);
     }
 
     private: int saveCount;

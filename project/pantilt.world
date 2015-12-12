@@ -10,7 +10,28 @@
     <include>
       <uri>model://sun</uri>
     </include>
-    
+   <model name ='box'>
+      <pose>10 0 .5 0 0 0</pose>
+      <link name='boxlink'>
+         <collision name='collision'>
+            <geometry>
+               <box><size>1 1 1</size></box>
+            </geometry>
+         </collision>
+
+         <visual name = 'visual'>
+            <geometry>
+               <box><size>1 1 1</size></box>
+            </geometry>
+            <material>
+               <ambient>1 0 0 1</ambient>
+               <diffuse>1 0 0 1</diffuse>
+               <specular>0.1 0.1 0.1 1</specular>
+               <emissive>0 0 0 0</emissive>
+            </material>
+         </visual>
+      </link>
+   </model> 
 
    <model name ='PanTiltCam'>
 <static>false</static>
@@ -124,6 +145,7 @@
             </material>
          </visual>
          <sensor name='cam_sensor1' type='camera'>
+             <pose>.021 0 0 0 0 0</pose>
              <always_on>true</always_on>
              <update_rate>10</update_rate>
              <visualize>true</visualize>
@@ -136,10 +158,10 @@
                 </image>
                 <clip>
                    <near>0.5</near>
-                   <far>5</far>
+                   <far>50</far>
                 </clip>
              </camera>
-             <plugin name='pt_video' filename='build/libpt_video.so'/>
+             <!-- <plugin name='pt_video' filename='build/libpt_video.so'/> -->
          </sensor>
       </link>
 

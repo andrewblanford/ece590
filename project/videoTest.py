@@ -38,17 +38,17 @@ import numpy as np
 import math
 
 # CV setup 
-cv.NamedWindow("wctrl", cv.CV_WINDOW_AUTOSIZE)
+cv.NamedWindow("wctrl_L", cv.CV_WINDOW_AUTOSIZE)
 
 # added
 ##sock.connect((MCAST_GRP, MCAST_PORT))
-newx = 640
-newy = 480
+newx = 640 #320
+newy = 480 #240
 
 nx = 320
 ny = 240
 
-vl = ach.Channel(pt_ach.ROBOT_VID_CHAN)
+vl = ach.Channel('robot-vid-chan')
 vl.flush()
 
 while True:
@@ -59,8 +59,13 @@ while True:
     [status, framesize] = vl.get(vidL, wait=False, last=True)
     if status == ach.ACH_OK or status == ach.ACH_MISSED_FRAME or status == ach.ACH_STALE_FRAMES:
         vid2 = cv2.resize(vidL,(nx,ny))
-        #imgL = cv2.cvtColor(vid2,cv2.COLOR_BGR2RGB)
-        cv2.imshow("wctrl", imgL)
+        imgL = cv2.cvtColor(vid2,cv2.COLOR_BGR2RGB)
+        cv2.imshow("wctrl_L", imgL)
         cv2.waitKey(10)
     else:
         raise ach.AchException( v.result_string(status) )
+
+    time.sleep(0.1)   
+#-----------------------------------------------------
+#-----------------------------------------------------
+#-----------------------------------------------------
