@@ -26,10 +26,21 @@
 // ach channels
 ach_channel_t chan_pt_drive_ref;     
 ach_channel_t chan_time;
+ach_channel_t user_config_chan;
 
 int debug = 0;
 double H_ref[2] = {};
 double ttime = 0.0;
+struct USER_CONFIG {
+double pid[3];
+double des[2];
+char tgt[6];
+char flag[1];
+};
+
+struct USER_CONFIG user_config; 
+
+
 namespace gazebo
 {   
   class ModelPanTiltDrive : public ModelPlugin
@@ -64,6 +75,8 @@ namespace gazebo
         assert( ACH_OK == r );
         ach_put(&chan_time, &ttime , sizeof(ttime));
 
+        r = ach_open(&user_config_chan, "user-config-chan" , NULL);
+        assert( ACH_OK == r );
 
         // Store the pointer to the model
         this->model = _parent;
@@ -141,14 +154,20 @@ namespace gazebo
       }
       else{   assert( sizeof(H_ref) == fs ); }
 
-      this->pan_joint_->SetMaxForce(0, 100);
-      this->tilt_joint_->SetMaxForce(0, 100);
-      this->pan_joint_->SetAngle(0, H_ref[0]);
-      this->tilt_joint_->SetAngle(0, H_ref[1]);
+      ach_get( &user_config_chan, &user_config, sizeof(user_config), &fs, NULL, ACH_O_LAST );
 
-      // send out the time
-      ttime = this->world->GetSimTime().Double();
-      ach_put(&chan_time, &ttime, sizeof(ttime));
+      // check if we are in simulate or real mode
+      if (user_config.flag[0] == 0) {
+         // update the robot
+         this->pan_joint_->SetMaxForce(0, 100);
+         this->tilt_joint_->SetMaxForce(0, 100);
+         this->pan_joint_->SetAngle(0, H_ref[0]);
+         this->tilt_joint_->SetAngle(0, H_ref[1]);
+
+         // send out the time
+         ttime = this->world->GetSimTime().Double();
+         ach_put(&chan_time, &ttime, sizeof(ttime));
+      }
     }
 
     // Pointer to the model

@@ -40,11 +40,24 @@
 
 // ach channels
 ach_channel_t chan_vid_chan;
+ach_channel_t user_config_chan;
+
+struct USER_CONFIG {
+double pid[3];
+double des[2];
+char tgt[6];
+char flag[1];
+};
+
+struct USER_CONFIG user_config; 
 
 void cbVid(ConstImageStampedPtr &_msg)
 {
   size_t size;
-  ach_put(&chan_vid_chan, _msg->image().data().c_str() , _msg->image().data().size());
+  // check the robot flag before sending video
+  if (user_config.flag[0] == 0) {
+     ach_put(&chan_vid_chan, _msg->image().data().c_str() , _msg->image().data().size());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -52,6 +65,8 @@ int main(int _argc, char **_argv)
 {
   /* open ach channel */
   int r = ach_open(&chan_vid_chan, "robot-vid-chan" , NULL);
+  assert( ACH_OK == r );
+  r = ach_open(&user_config_chan, "user-config-chan", NULL);
   assert( ACH_OK == r );
 
   // Load gazebo
@@ -72,8 +87,11 @@ int main(int _argc, char **_argv)
 
   printf("%i\n\r",3);
   // Busy wait loop...replace with your own code as needed.
-  while (true)
+  size_t fs;
+  while (true) {
     gazebo::common::Time::MSleep(100);
+    ach_get( &user_config_chan, &user_config, sizeof(user_config), &fs, NULL, ACH_O_LAST );
+  }
 
   // Make sure to shut everything down.
   gazebo::transport::fini();
