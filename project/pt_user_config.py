@@ -65,10 +65,15 @@ def changeTarget(config):
    config.tgt[4] = g
    config.tgt[5] = b
 
+
 pt_config = pt_ach.PT_USER_CONFIG()
+ref = pt_ach.PT_REF()
 
 c = ach.Channel(pt_ach.USER_CONFIG_CHAN)
 c.flush()
+
+r = ach.Channel(pt_ach.ROBOT_PT_DRIVE_CHAN)
+r.flush()
 
 # default PID constants
 pt_config.pid[0] = .1
@@ -106,6 +111,10 @@ while (True):
          pt_config.flag[0] = 0
       else:
          pt_config.flag[0] = 1
+   elif i == 5:
+      ref.ref[0] = 0.0
+      ref.ref[1] = 0.0
+      r.put(ref)
    else:
       print 'Input', i, 'not understood'
    

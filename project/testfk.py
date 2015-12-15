@@ -7,7 +7,7 @@ import math
 import pt_fk as fk
 
 # define some random angles
-theta = [0, 0]
+theta = [1.57, 1.57]
 
 # get the transform
 t = fk.getT(theta)

@@ -49,11 +49,11 @@ c = ach.Channel(pt_ach.USER_CONFIG_CHAN)
 # CV setup 
 cv.NamedWindow("wctrl", cv.CV_WINDOW_AUTOSIZE)
 
-newx = 640 #320
-newy = 480 #240
+newx = 160 #320
+newy = 120 #240
 
-nx = 320
-ny = 240
+nx = 160
+ny = 120
 
 while True:
     # Get Frame

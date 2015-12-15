@@ -12,7 +12,10 @@ import ach
 
 def getDist(e, g):
 	"euclidian distance between two points"
-	return math.sqrt((e[0] - g[0])**2 + (e[1] - g[1])**2)
+	dist = 0
+	for i in range(len(e)):
+		dist += (e[i] - g[i])**2
+	return math.sqrt(dist)
 
 
 def getFK(theta):
@@ -24,7 +27,8 @@ def getJ(theta, dTheta):
 	jac = np.zeros(shape=(len(e), len(theta)))
 	for i in range(len(e)):
 		for j in range(len(theta)):
-			thetaNew = theta
+			# make a copy of the theta array!
+			thetaNew = list(theta)
 			# make a small change in j-th variable
 			thetaNew[j] = thetaNew[j] + dTheta
 			# recompute position give that
@@ -42,12 +46,11 @@ def getNextPointDelta(e, g, step):
 	return m * step
 
 def rangeCheck(a):
-	"limit the angle to 0 - 2pi"
-	twoPi = 2 * math.pi
-	while (a < 0):
-		a += twoPi
-	while (a > twoPi):
-		a -= twoPi
+	"limit the angle to +/- pi"
+	while (a < -math.pi):
+		a += math.pi
+	while (a > math.pi):
+		a -= math.pi
 	return a
 
 # g = goal
@@ -57,7 +60,7 @@ def getIK(g, theta):
    # current position 
    e = getFK(theta)
    # target error 1% of arm length
-   err = .01
+   err = .006
    # delta theta
    thetaStep = .01
    # path step size - half of error
@@ -66,63 +69,15 @@ def getIK(g, theta):
    iterations = 0
 
    # iterate until e is close enough to g
-   while (getDist(e, g) > err):
+   while (getDist(e, g) > err) and iterations < 1000:
       J = getJ(theta, thetaStep)
       Jp = np.linalg.pinv(J)
       dE = np.transpose(getNextPointDelta(e, g, step))
       dTheta = Jp * dE
-      theta = np.squeeze(np.asarray(theta + np.transpose(dTheta)))
+      theta = np.squeeze(np.asarray(np.add(theta, np.transpose(dTheta))))
       e = getFK(theta)
       iterations += 1
 
-   print iterations
    return map(rangeCheck, theta)
 
-
-# setup ach
-ref = pt_ach.PT_REF()
-cmd = pt_ach.PT_REF()
-#ref_out = ach.Channel(pt_ach.ROBOT_PT_DRIVE_CHAN)
-#ref.flush()
-#ref_in = ach.Channel(pt_ach.COMMAND_CHAN)
-
-# zero the controls before we start
-ref.ref[0] = 0
-ref.ref[1] = 0
-#ref_out.put(ref)
-
-# joint space angles
-#[pan, tilt, end]
-thetaJS = [0.0, 0.0, 0.0]
-
-# start position
-goal =  [0.0, 0.0, .124]
-
-# pt unit end effector can only be in sphere
-RADIUS = .0455
-HEIGHT = .0785
-thetaX = 0.0
-thetaY = 0.0
-
-#while True:
-#   ref_in.get(cmd, wait=True, last=True)
-
-   # adjust the goal position
-#   thetaX = thetaX + cmd.ref[0]
-#   thetaY = thetaY + cmd.ref[1]
-   # x
-#   goal[0] = RADIUS * math.cos(thetaX) * math.sin(thetaY)
-   # y
-#   goal[1] = RADIUS * math.sin(thetaX) * math.sin(thetaY)
-   # z
-#   goal[2] = RADIUS * math.cos(thetaY) + HEIGHT
-
-   # get the new angles
-#   thetaJS = getIK(goal, thetaJS)
-
-#   print thetaJS
-
-#   ref.ref[0] = thetaJS[0]
-#   ref.ref[1] = thetaJS[1]
-#   ref_out.put(ref)
 

@@ -99,5 +99,5 @@ def getFK(theta):
 	"compute FK given current angles"
 	t = getT(theta)
 	pos = getPos(t)
-	return [pos['x'], pos['y'], pos['z']]
+	return [pos['x'], pos['y'], pos['z'], pos['tx'], pos['ty'], pos['tz']]
 	

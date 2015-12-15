@@ -164,8 +164,12 @@ namespace gazebo
          this->pan_joint_->SetAngle(0, H_ref[0]);
          this->tilt_joint_->SetAngle(0, H_ref[1]);
 
-         // send out the time
+         // send out the sim time
          ttime = this->world->GetSimTime().Double();
+         ach_put(&chan_time, &ttime, sizeof(ttime));
+      } else {
+         // send out the wall time
+         ttime = common::Time::GetWallTime().Double();
          ach_put(&chan_time, &ttime, sizeof(ttime));
       }
     }

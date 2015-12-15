@@ -42,14 +42,14 @@ cfg = pt_ach.PT_USER_CONFIG()
 ref_in = ach.Channel(pt_ach.TARGET_POSITION_CHAN)
 ref_out = ach.Channel(pt_ach.COMMAND_CHAN)
 ref_out.flush()
-t = ach.Channel(ROBOT_TIME_CHAN)
-c = ach.Channel(USER_CONFIG_CHAN)
+t = ach.Channel(pt_ach.ROBOT_TIME_CHAN)
+c = ach.Channel(pt_ach.USER_CONFIG_CHAN)
 
 tLast = 0
 xErrLast = 0
 yErrLast = 0
-xIntegral
-yIntegral
+xIntegral = 0.0
+yIntegral = 0.0
 
 while True:
    # wait for new target position
@@ -77,13 +77,13 @@ while True:
    # tim.sim[0] = Sim Time
    # cmd.ref[0] = theta x
    # cmd.ref[1] = theta y
-   kp = config.pid[0]
-   ki = config.pid[1]
-   kd = config.pid[2]
+   kp = cfg.pid[0]
+   ki = cfg.pid[1]
+   kd = cfg.pid[2]
 
    tNow = tim.sim[0]
    dt = tNow - tLast 
-
+ 
    # get current x and y
    xLoc = tgt.ref[0]
    yLoc = tgt.ref[1]
@@ -95,10 +95,20 @@ while True:
    # calculate error
    xErr = xDes - xLoc
    yErr = yDes - yLoc
+   print 'err', xErr, 'last', xErrLast
 
    # accumlate error
    xIntegral += xErr * dt
    yIntegral += yErr * dt
+   print 'xint', xIntegral
+
+   print 'dt', dt
+   # if dt large, reset 
+   if dt > .5:
+      xIntegral = 0.0
+      yIntegral = 0.0
+      xErrLast = 0.0
+      yErrLast = 0.0
 
    # perform pid operation
    xCmd = (kp * xErr) + (ki * xIntegral) + (kd * ((xErr - xErrLast) / dt))
@@ -112,4 +122,5 @@ while True:
    # set commands
    cmd.ref[0] = xCmd
    cmd.ref[1] = yCmd
-   ref_out.put(ref);
+   print 'cmd', cmd.ref[0], cmd.ref[1]
+   ref_out.put(cmd);
