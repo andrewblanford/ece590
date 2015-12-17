@@ -10,9 +10,11 @@ import ach
 # setup ach
 ref = pt_ach.PT_REF()
 cmd = pt_ach.PT_REF()
+state = pt_ach.PT_REF()
 ref_out = ach.Channel(pt_ach.ROBOT_PT_DRIVE_CHAN)
 ref_out.flush()
 ref_in = ach.Channel(pt_ach.COMMAND_CHAN)
+s = ach.Channel(pt_ach.ROBOT_STATE_CHAN)
 
 # joint space angles
 #[pan, tilt]
@@ -39,11 +41,14 @@ while True:
    dPan = cmd.ref[0]
    dTilt = cmd.ref[1]
 
-   # get the current goal position
-   # TODO: this should use a state channel feedback
+   # get the current goal position using current state
+   s.get(state, wait=False, last=True)
+   thetaJS[0] = state.ref[0]
+   thetaJS[1] = state.ref[1]
+   print 'State:', thetaJS
    goal = fk.getFK(thetaJS)
 
-   # adjust the goal position
+   # adjust the goal position theta_y and theta_z orientations
    goal[4] += dTilt
    goal[5] += dPan
 

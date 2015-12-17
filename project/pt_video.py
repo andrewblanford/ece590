@@ -25,10 +25,12 @@ ny = 120
 
 while True:
    c.get(cfg, wait=False, last=True)
+   ret, vid = capture.read()
+   vid2 = cv2.resize(vid,(nx,ny))
+   cv2.imshow("pt_video", vid2)
+   cv2.waitKey(20)
    if cfg.flag[0] == 1:
-      ret, vid = capture.read()
-      vid2 = cv2.resize(vid,(nx,ny))
-      cv2.imshow("pt_video", vid2)
       v.put(vid2)
+
 
    time.sleep(0.1)

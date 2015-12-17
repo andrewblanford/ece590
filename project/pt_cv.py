@@ -63,7 +63,11 @@ while True:
     [status, framesize] = v.get(vid, wait=False, last=True)
     if status == ach.ACH_OK or status == ach.ACH_MISSED_FRAME or status == ach.ACH_STALE_FRAMES:
         vid2 = cv2.resize(vid,(nx,ny))
-        img = cv2.cvtColor(vid2,cv2.COLOR_BGR2RGB)
+        # for robot color is already RGB
+        img = vid2
+        # need to convert for sim 
+        if cfg.flag[0] == 0:
+           img = cv2.cvtColor(vid2,cv2.COLOR_BGR2RGB)
         cv2.imshow("wctrl", img)
         cv2.waitKey(10)
     else:

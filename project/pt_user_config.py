@@ -35,6 +35,7 @@ def printMenu(config):
       print '\tUsing Robot'
    else:
       print '\tUsing Sim'
+   print '5. Reset Pan/Tilt'
    print '**********************\n'
 
 def changeGain(config):
@@ -76,9 +77,9 @@ r = ach.Channel(pt_ach.ROBOT_PT_DRIVE_CHAN)
 r.flush()
 
 # default PID constants
-pt_config.pid[0] = .1
-pt_config.pid[1] = 0
-pt_config.pid[2] = 0
+pt_config.pid[0] = 0.2
+pt_config.pid[1] = 0.01
+pt_config.pid[2] = 0.01
 
 # default desired point = 0,0
 pt_config.des[0] = 0

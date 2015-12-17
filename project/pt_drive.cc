@@ -27,9 +27,11 @@
 ach_channel_t chan_pt_drive_ref;     
 ach_channel_t chan_time;
 ach_channel_t user_config_chan;
+ach_channel_t state_chan;
 
 int debug = 0;
 double H_ref[2] = {};
+double H_state[2] = {};
 double ttime = 0.0;
 struct USER_CONFIG {
 double pid[3];
@@ -66,6 +68,7 @@ namespace gazebo
         // Open Ach channel
         /* open ach channel */
         memset( &H_ref,   0, sizeof(H_ref));
+        memset( &H_state,   0, sizeof(H_state));
         int r = ach_open(&chan_pt_drive_ref, "robot-pt-drive" , NULL);
         assert( ACH_OK == r );
         ach_put(&chan_pt_drive_ref, &H_ref , sizeof(H_ref));      
@@ -77,6 +80,10 @@ namespace gazebo
 
         r = ach_open(&user_config_chan, "user-config-chan" , NULL);
         assert( ACH_OK == r );
+
+        r = ach_open(&state_chan, "robot-state", NULL);
+        assert( ACH_OK == r);
+        ach_put(&state_chan, &H_state, sizeof(H_state));
 
         // Store the pointer to the model
         this->model = _parent;
@@ -167,6 +174,11 @@ namespace gazebo
          // send out the sim time
          ttime = this->world->GetSimTime().Double();
          ach_put(&chan_time, &ttime, sizeof(ttime));
+ 
+         // update the state
+         H_state[0] = this->pan_joint_->GetAngle(0).Radian();
+         H_state[1] = this->tilt_joint_->GetAngle(0).Radian();
+         ach_put(&state_chan, &H_state, sizeof(H_state));
       } else {
          // send out the wall time
          ttime = common::Time::GetWallTime().Double();

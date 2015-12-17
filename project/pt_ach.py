@@ -10,6 +10,7 @@ ROBOT_VID_CHAN='robot-vid-chan'
 USER_CONFIG_CHAN='user-config-chan'
 TARGET_POSITION_CHAN='target-position-chan'
 COMMAND_CHAN='command-chan'
+ROBOT_STATE_CHAN='robot-state'
 
 # [0] pan angle
 # [1] tilt angle

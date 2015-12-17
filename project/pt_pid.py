@@ -34,6 +34,16 @@ from ctypes import *
 import socket
 import numpy as np
 
+def integralLimit(i):
+   MAX = 1.0
+   MIN = -1.0
+   result = i
+   if (i > MAX):
+      result = MAX
+   if (i < MIN):
+      result = MIN
+   return result
+
 tgt = pt_ach.PT_REF()
 cmd = pt_ach.PT_REF()
 tim = pt_ach.PT_TIME()
@@ -100,6 +110,8 @@ while True:
    # accumlate error
    xIntegral += xErr * dt
    yIntegral += yErr * dt
+   xIntegral = integralLimit(xIntegral)
+   yIntegral = integralLimit(yIntegral)
    print 'xint', xIntegral
 
    print 'dt', dt

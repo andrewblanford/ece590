@@ -4,6 +4,7 @@ ROBOT_VID_CHAN='robot-vid-chan'
 USER_CONFIG_CHAN='user-config-chan'
 TARGET_POSITION_CHAN='target-position-chan'
 COMMAND_CHAN='command-chan'
+ROBOT_STATE_CHAN='robot-state'
 
 MakeAch()
 {
@@ -12,7 +13,8 @@ MakeAch()
 	ach -1 -C $ROBOT_VID_CHAN      	-m 30 -n 3000000
 	ach -1 -C $USER_CONFIG_CHAN    	-m 10 -n 3000 
 	ach -1 -C $TARGET_POSITION_CHAN -m 10 -n 3000 
-	ach -1 -C $COMMAND_CHAN -m 10 -n 3000 
+	ach -1 -C $COMMAND_CHAN         -m 10 -n 3000 
+	ach -1 -C $ROBOT_STATE_CHAN     -m 10 -n 3000 
 }
 
 KillAch()
